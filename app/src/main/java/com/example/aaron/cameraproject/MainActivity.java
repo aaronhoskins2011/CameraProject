@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int CAMERA_REQUEST = 1888;
     ImageView ivPhoto;
     Button takePicture;
-    String mCurrentPhotoPath;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,45 +28,31 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         this.ivPhoto = (ImageView)findViewById(R.id.imgView1);
         takePicture = (Button)findViewById(R.id.takePhoto);
+        takePicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent camIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(camIntent,CAMERA_REQUEST);
+            }
+        });
 
     }
 
-    public void takePhoto(View view){
-        Intent camIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        File picFile = null;
-        try {
-            picFile = createImageFile();
-        } catch (IOException ex) {
 
-        }
-        camIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(picFile));
-        startActivityForResult(camIntent,CAMERA_REQUEST);
 
-    }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == CAMERA_REQUEST && requestCode == RESULT_OK){
+        if(requestCode == CAMERA_REQUEST && resultCode == RESULT_OK){
             Bitmap pic = (Bitmap)data.getExtras().get("data");
             ivPhoto.setImageBitmap(pic);
-
         }
-    }
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  // prefix
-                ".jpg",         // suffix
-                storageDir      // directory
-        );
 
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
-        return image;
+
+
     }
+
 }
